@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="supSeparator">#33FFFFFF</color>
+    <color name="supOverlay">#52000000</color>
+    <color name="labPrimary">#FFFFFF</color>
+    <color name="labSecondary">#99FFFFFF</color>
+    <color name="labTertiary">#66FFFFFF</color>
+    <color name="labDisable">#26FFFFFF</color>
+    <color name="red">#FF453A</color>
+    <color name="green">#32D74B</color>
+    <color name="blue">#0A84FF</color>
+    <color name="grey">#8E8E93</color>
+    <color name="grayLight">#48484A</color>
+    <color name="white">#FFFFFF</color>
+    <color name="backPrimary">#161618</color>
+    <color name="backSecondary">#252528</color>
+    <color name="backElevated">#3C3C3F</color>
+</resources>

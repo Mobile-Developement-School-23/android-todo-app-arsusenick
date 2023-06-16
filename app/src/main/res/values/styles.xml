@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/supSeparator</item>
+        <item name="colorControlActivated">@color/green</item>
+    </style>
+    <style name="MyCheckBoxRed" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/red</item>
+        <item name="colorControlActivated">@color/green</item>
+    </style>
+    <style name="MyCheckBoxBlue" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/blue</item>
+        <item name="colorControlActivated">@color/blue</item>
+    </style>
+    <style name="MyToolbarTextAppearance" parent="android:TextAppearance">
+        <item name="android:textSize">32sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/labPrimary</item>
+    </style>
+</resources>

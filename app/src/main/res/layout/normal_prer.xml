@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/lay"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backSecondary"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp">
+
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:text=""
+        android:theme="@style/MyCheckBox"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/task"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:ellipsize="end"
+        android:gravity="bottom"
+        android:maxLines="3"
+        android:text="Привет я биба"
+        android:textColor="@color/labPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/checkBox"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/dataDone"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:text="Дата"
+        android:visibility="visible"
+        android:textColor="@color/labTertiary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/checkBox"
+        app:layout_constraintTop_toBottomOf="@+id/task" />
+
+    <ImageButton
+        android:id="@+id/about_butt"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/attantion_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

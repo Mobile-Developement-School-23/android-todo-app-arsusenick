@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/backSecondary"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp">
+
+
+    <androidx.appcompat.widget.AppCompatCheckBox
+        android:id="@+id/low_checkBox"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:text=""
+        android:theme="@style/MyCheckBox"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/low_task"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:text="Привет я биба"
+        android:gravity="bottom"
+        android:ellipsize="end"
+        android:maxLines="3"
+        android:textColor="@color/labPrimary"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/arrow"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/low_dataDone"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="5dp"
+        android:text="Дата"
+        android:visibility="visible"
+        android:textColor="@color/labTertiary"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/arrow"
+        app:layout_constraintTop_toBottomOf="@+id/low_task" />
+    
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="11dp"
+        android:layout_height="20dp"
+        android:layout_marginStart="0dp"
+        app:layout_constraintStart_toEndOf="@id/low_checkBox"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/arrow"/>
+
+    <ImageButton
+        android:id="@+id/about_butt"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="0dp"
+        android:background="@drawable/attantion_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

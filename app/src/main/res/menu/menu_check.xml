@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/buton"
+        android:title=""
+        android:checkable="true"
+        app:actionLayout="@layout/tog_but"
+        app:showAsAction="always" />
+</menu>
