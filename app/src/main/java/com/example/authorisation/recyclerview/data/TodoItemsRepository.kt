@@ -2,7 +2,7 @@ package com.example.authorisation.recyclerview.data
 
 import android.content.Context
 import androidx.fragment.app.FragmentActivity
-//Репозиторий с захардкодиными значениями
+//Репозиторий с захардкодиными значениями --
 class TodoItemsRepository {
 
     fun getTasks(context: Context?): List<TaskPreview>{
