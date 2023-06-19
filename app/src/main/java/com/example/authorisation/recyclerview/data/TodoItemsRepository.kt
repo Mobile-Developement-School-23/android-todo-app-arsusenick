@@ -7,7 +7,7 @@ class TodoItemsRepository {
 
     fun getTasks(context: Context?): List<TaskPreview>{
         return buildList {
-            val date = "10/07/2023"
+            val date = "10/08/2023"
             val text = "Скушать булочку, попить водичку, ММММ блаженство"
             val text1 = "Cходить в магазин"
             val text2 = "Узнать как можно купить машину не покупая машину и при это остаться при деньгах и на свободе"
