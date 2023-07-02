@@ -67,32 +67,34 @@
         tools:context=".MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-
-
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pull_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/tasks_background"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tasks"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:itemCount="4"
-            tools:listitem="@layout/low_prer"
-            android:paddingBottom="10dp"/>
+            android:orientation="vertical">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:itemCount="4"
+                android:background="@drawable/background_recycle"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/low_prer"
+                android:paddingBottom="10dp"/>
+
+        </LinearLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton

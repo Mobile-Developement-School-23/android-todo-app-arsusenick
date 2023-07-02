@@ -12,7 +12,8 @@ interface ItemListener{
 }
 
 class DealAdapter(
-    private val onItemListener: ItemListener): ListAdapter<TodoItem, ViewHolder>(CommonCallbackImpl()){
+    private val onItemListener: ItemListener):
+    ListAdapter<TodoItem, ViewHolder>(CommonCallbackImpl()){
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder.create(parent)
