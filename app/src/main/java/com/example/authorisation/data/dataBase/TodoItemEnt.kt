@@ -28,9 +28,9 @@ data class TodoItemEnt(
         fun fromItem(toDoItem: TodoItem): TodoItemEnt {
             return TodoItemEnt(
                 id = toDoItem.id,
-                description = toDoItem.textTask,
+                description = toDoItem.text,
                 importance = toDoItem.importance,
-                deadline = toDoItem.deadLine?.time,
+                deadline = toDoItem.deadline?.time,
                 done = toDoItem.done,
                 createdAt = toDoItem.dateCreation.time,
                 changedAt = toDoItem.dateChanged?.time

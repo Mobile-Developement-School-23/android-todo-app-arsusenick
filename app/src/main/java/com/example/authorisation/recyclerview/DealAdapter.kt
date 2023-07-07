@@ -4,16 +4,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.authorisation.MyItemRecyclerViewAdapter
 import com.example.authorisation.data.dataBase.TodoItem
-import com.example.authorisation.recyclerview.domain.CommonCallbackImpl
+import com.example.authorisation.recyclerview.domain.DiffUtilCallbackImpl
 
-interface ItemListener{
+interface ItemListener {
     fun onItemClick(id: String)
+
     fun onCheckClick(todoItem: TodoItem)
 }
 
-class DealAdapter(
-    private val onItemListener: ItemListener):
-    ListAdapter<TodoItem, ViewHolder>(CommonCallbackImpl()){
+class DealsAdapter(
+    private val onItemListener: ItemListener
+) : ListAdapter<TodoItem, ViewHolder>(DiffUtilCallbackImpl()) {
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder.create(parent)
@@ -21,4 +23,4 @@ class DealAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), onItemListener)
     }
-    }
+}

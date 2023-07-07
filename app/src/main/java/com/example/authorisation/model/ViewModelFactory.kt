@@ -6,14 +6,17 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.authorisation.App
 import com.example.authorisation.internetThings.locale
 
-class ViewModelFactory(private val app: App): ViewModelProvider.Factory{
+class ViewModelFactory(
+    private val app: App
+) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val viewModel = when (modelClass) {
             MyViewModel::class.java -> {
-                MyViewModel(locale(), locale(), locale())
+                MyViewModel(locale(), locale())
             }
+
             else -> {
                 throw IllegalStateException("Unknown view model class")
             }

@@ -47,13 +47,13 @@ data class TODOItem(
         fun fromItem(toDoItem: TodoItem): TODOItem {
             return TODOItem(
                 id = toDoItem.id,
-                text = toDoItem.textTask,
+                text = toDoItem.text,
                 importance = when (toDoItem.importance) {
                     Importance.LOW -> "low"
                     Importance.REGULAR -> "basic"
                     Importance.URGENT -> "important"
                 },
-                deadline = toDoItem.deadLine?.time,
+                deadline = toDoItem.deadline?.time,
                 done = toDoItem.done,
                 dateCreation = toDoItem.dateCreation.time,
                 dateChanged = when (toDoItem.dateChanged) {
@@ -62,7 +62,7 @@ data class TODOItem(
                         toDoItem.dateChanged!!.time
                     }
                 },
-                updated_by = BaseUrl.updated_by
+                updated_by = BaseUrl.phoneID
             )
         }
     }

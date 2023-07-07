@@ -18,7 +18,7 @@ class ViewHolder(private val binding: LowPrerBinding): RecyclerView.ViewHolder(b
     fun bind(item: TodoItem, onItemList: ItemListener){
         this.todoItem = item
         if (item.done) {
-            binding.lowTask.text = item.textTask
+            binding.lowTask.text = item.text
             binding.lowTask.paintFlags = binding.lowTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
             binding.lowTask.setTextColor(itemView.context.getColor(R.color.labTertiary))
 
@@ -31,12 +31,12 @@ class ViewHolder(private val binding: LowPrerBinding): RecyclerView.ViewHolder(b
             binding.arrow.visibility = View.GONE
             binding.lowDataDone.visibility = View.GONE
     }   else{
-            binding.lowTask.text = item.textTask
+            binding.lowTask.text = item.text
             binding.lowTask.paintFlags = binding.lowTask.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG.inv()
             binding.lowTask.setTextColor(itemView.context.getColor(R.color.labPrimary))
             binding.lowCheckBox.isChecked = false
 
-            if(item.deadLine != null){
+            if(item.deadline != null){
                 binding.lowDataDone.visibility = View.VISIBLE
                 binding.lowDataDone.text = item.deadlineToString()
             } else {

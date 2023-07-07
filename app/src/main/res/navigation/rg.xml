@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_blankFragment_to_blankFragment2"
             app:destination="@id/blankFragment2" />
+        <action
+            android:id="@+id/action_blankFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/blankFragment2"
@@ -20,6 +23,15 @@
         tools:layout="@layout/fragment_blank2" >
         <action
             android:id="@+id/action_blankFragment2_to_blankFragment"
+            app:destination="@id/blankFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.authorisation.ui.LoginFragment"
+        android:label="fragment_login"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_loginFragment_to_blankFragment"
             app:destination="@id/blankFragment" />
     </fragment>
 </navigation>

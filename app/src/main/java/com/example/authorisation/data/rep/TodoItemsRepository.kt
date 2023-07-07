@@ -6,6 +6,7 @@ import com.example.authorisation.SharedPreferencesHelper
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.data.dataBase.TodoItemDatabase
 import com.example.authorisation.data.dataBase.TodoItemEnt
+import com.example.authorisation.internetThings.StateLoad
 import com.example.authorisation.internetThings.network.BaseUrl
 import com.example.authorisation.internetThings.network.NetworkAccess
 import com.example.authorisation.internetThings.network.responces.PatchListAPI
@@ -24,13 +25,6 @@ class TodoItemsRepository(
     private val sharedPreferencesHelper: SharedPreferencesHelper) {
 
     private val itemDao = todoItemsDB.todoItemDao
-
-//    private var currentTask: TodoItemEnt? = null
-//
-//    private var eyeIsVisibility = true
-//
-//    private val coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-
     fun getAllData(): Flow<List<TodoItem>> =
         itemDao.getAllFlow().map { list -> list.map { it.toItem() } }
 
@@ -57,208 +51,139 @@ class TodoItemsRepository(
 
     private val service = BaseUrl.retrofitService
 
-    suspend fun getNetworkData() {
-        val networkListResponse = service.getList()
+    suspend fun getNetworkData(): StateLoad<Any> {
+        try {
+            val networkListResponse = service.getList()
+            if (networkListResponse.isSuccessful) {
+                val body = networkListResponse.body()
+                if (body != null) {
+                    val revision = body.revision
+                    val networkList = body.list
+                    val currentList = itemDao.getAll().map { TODOItem.fromItem(it.toItem()) }
+                    val mergedList = HashMap<String, TODOItem>()
 
-
-        if (networkListResponse.isSuccessful) {
-            val body = networkListResponse.body()
-            if (body != null) {
-                val networkList = body.list
-                val currentList = itemDao.getAll().map { TODOItem.fromItem(it.toItem()) }
-                val mergedList = HashMap<String, TODOItem>()
-
-                for(item in networkList){
-                    mergedList[item.id] = item
-                    Log.d("1", "${item.id} ${item.dateChanged}")
-                }
-                for (item in currentList) {
-                    if (mergedList.containsKey(item.id)) {
-                        val item1 = mergedList[item.id]
-                        if (item.dateChanged > item1!!.dateChanged) {
-                            mergedList[item.id] = item
-                        }else{
-                            mergedList[item.id] = item1
-                        }
-                    }else{
+                    for (item in currentList) {
                         mergedList[item.id] = item
                     }
+                    for (item in networkList) {
+                        if (mergedList.containsKey(item.id)) {
+                            val item1 = mergedList[item.id]
+                            if (item.dateChanged > item1!!.dateChanged) {
+                                mergedList[item.id] = item
+                            } else {
+                                mergedList[item.id] = item1
+                            }
+                        } else if (revision != sharedPreferencesHelper.getLastRevision()) {
+                            mergedList[item.id] = item
+                        }
+                    }
+
+                    return updateNetworkList(mergedList.values.toList())
                 }
-
-                updateNetworkList(mergedList.values.toList())
+            } else {
+                networkListResponse.errorBody()?.close()
             }
+        } catch (exception: Exception) {
+            return StateLoad.Error("Merge failed, offline.")
         }
+        return StateLoad.Error("Merge failed, offline.")
+
     }
 
-    private suspend fun updateNetworkList(mergedList: List<TODOItem>) {
+    private suspend fun updateNetworkList(mergedList: List<TODOItem>): StateLoad<Any> {
 
-        val updateResponse = service.updateList(
-            sharedPreferencesHelper.getLastRevision(),
-            PatchListAPI(mergedList)
-        )
+        try {
+            val updateResponse = service.updateList(
+                sharedPreferencesHelper.getLastRevision(),
+                PatchListAPI(mergedList)
+            )
 
 
-        if (updateResponse.isSuccessful) {
-            val responseBody = updateResponse.body()
-            if (responseBody != null) {
-                sharedPreferencesHelper.putRevision(responseBody.revision)
-                updateRoom(responseBody.list)
+            if (updateResponse.isSuccessful) {
+                val responseBody = updateResponse.body()
+                if (responseBody != null) {
+                    sharedPreferencesHelper.putRevision(responseBody.revision)
+                    updateRoom(responseBody.list)
+                    return StateLoad.Success(responseBody.list)
+                }
+            } else {
+                updateResponse.errorBody()?.close()
             }
+        } catch (err: Exception) {
+            return StateLoad.Error("Merge failed, offline.")
         }
+        return StateLoad.Error("Merge failed, offline.")
     }
 
-    private suspend fun updateRoom(response: List<TODOItem>) {
-        val list = response.map { it.toItem() }
-        itemDao.addList(list.map { TodoItemEnt.fromItem(it) })
+    private suspend fun updateRoom(mergedList: List<TODOItem>) {
+        itemDao.addList(mergedList.map { TodoItemEnt.fromItem(it.toItem()) })
     }
 
     suspend fun postNetworkItem(
-        lastRevision: Int,
         newItem: TodoItem
-    ): NetworkAccess<PostResponse> {
-        val postResponse = service.postElement(
-            lastRevision,
-            PostRequest(TODOItem.fromItem(newItem))
-        )
+    ) {
+        try {
+            val postResponse = service.postElement(
+                sharedPreferencesHelper.getLastRevision(),
+                PostRequest(TODOItem.fromItem(newItem))
+            )
 
-        if (postResponse.isSuccessful) {
-            val responseBody = postResponse.body()
-            if (responseBody != null) {
-                return NetworkAccess.Success(responseBody)
+            if (postResponse.isSuccessful) {
+                val responseBody = postResponse.body()
+                if (responseBody != null) {
+                    sharedPreferencesHelper.putRevision(responseBody.revision)
+                }
+            } else {
+                postResponse.errorBody()?.close()
             }
+        } catch (err: Exception) {
+            Log.d("1", err.message.toString())
         }
-        return NetworkAccess.Error(postResponse)
     }
 
     suspend fun deleteNetworkItem(
-        lastRevision: Int,
         id: String
-    ): NetworkAccess<PostResponse> {
-        val postResponse = service.deleteElement(id, lastRevision)
+    ) {
+        try {
+            val postResponse = service.deleteElement(id, sharedPreferencesHelper.getLastRevision())
 
-        if (postResponse.isSuccessful) {
-            val responseBody = postResponse.body()
-            if (responseBody != null) {
-                return NetworkAccess.Success(responseBody)
+            if (postResponse.isSuccessful) {
+                val responseBody = postResponse.body()
+                if (responseBody != null) {
+                    sharedPreferencesHelper.putRevision(responseBody.revision)
+                }
+            } else {
+                postResponse.errorBody()?.close()
             }
+        } catch (err: Exception) {
+            Log.d("1", err.message.toString())
         }
-        return NetworkAccess.Error(postResponse)
     }
 
     suspend fun updateNetworkItem(
-        lastRevision: Int,
         item: TodoItem
-    ) = withContext(Dispatchers.IO) {
-
-        val updateItemResponse = service.updateElement(
-            item.id, lastRevision, PostRequest(
-                TODOItem.fromItem(item)
+    ) {
+        try {
+            val updateItemResponse = service.updateElement(
+                item.id, sharedPreferencesHelper.getLastRevision(), PostRequest(
+                    TODOItem.fromItem(item)
+                )
             )
-        )
-        if (updateItemResponse.isSuccessful) {
-            val body = updateItemResponse.body()
-            if (body != null) {
-                sharedPreferencesHelper.putRevision(body.revision)
+            if (updateItemResponse.isSuccessful) {
+                val body = updateItemResponse.body()
+                if (body != null) {
+                    sharedPreferencesHelper.putRevision(body.revision)
+                }
+            } else {
+                updateItemResponse.errorBody()?.close()
             }
+        } catch (err: Exception) {
+            Log.d("1", "err")
         }
     }
 
-//    fun getTasks(context: Context?): List<TaskPreview>{
-//        TODO()
-////        eturn buildList {
-////            val date = "10/07/2023"
-////            val text = "Скушать булочку, попить водичку, ММММ блаженство"
-////            val text1 = "Cходить в магазин"
-////            val text2 = "Узнать как можно купить машину не покупая машину и при это остаться при деньгах и на свободе"
-////            val text3 = "Посмотреть телевизор"
-////            val text4 = "Скушать сгущенку и яблоко, и конфеты, и ботинки, и собаку, и кошку, окрошку, сережку, максимку, димку раунд..."
-////
-////            add(
-////                TaskPreview("0",1,text,
-////                date, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("1",1,text,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("2",2,text1,
-////            null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("3",0,text2,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("4",1,text3,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("5",1,text4,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("6",2,text2,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("7",1,text4,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("8",0,text,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("9",0,text1,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("10",2,text3,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("11",0,text,
-////                null, false, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("12",1,text4,
-////                null, false, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("13",2,text2,
-////                null, false, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("14",0,text,
-////                null, false, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("15",1,text3,
-////                null, true, date, null)
-////            )
-////
-////            add(
-////                TaskPreview("end",3,text1,
-////                null, false, date, null)
-////            )
-////
-////
-////        }
-//    }
+    suspend fun deleteAll() {
+        itemDao.deleteAll()
+    }
+
 }

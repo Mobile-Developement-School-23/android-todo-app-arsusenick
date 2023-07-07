@@ -3,10 +3,12 @@ package com.example.authorisation.ui
 import android.app.DatePickerDialog
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.DatePicker
 import android.widget.EditText
 import android.widget.ImageButton
@@ -26,6 +28,7 @@ import com.example.authorisation.R
 import com.example.authorisation.data.dataBase.Importance
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.databinding.FragmentBlank2Binding
+import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
 import com.example.authorisation.model.MyViewModel
 import com.example.authorisation.model.factory
 import com.example.authorisation.spinner.CustomDropDownAdapter
@@ -46,11 +49,9 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
 
     private var todoItem = TodoItem()
     private lateinit var binding: FragmentBlank2Binding
+    private lateinit var dialog: DatePickerDialog
 
-
-    private lateinit var spin: AppCompatSpinner
-    private val spinRep = SpinnerRep()
-    private var flag = 0
+    private var importent = 0
     private val calendar = Calendar.getInstance()
     private val formatter = SimpleDateFormat ("dd.MM.yyyy", Locale.UK)
     private val modelList = arrayListOf<Model>()
@@ -69,18 +70,16 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
+    ): View = FragmentBlank2Binding.inflate(LayoutInflater.from(context)).also { binding = it }.root
 
-        modelList.add(Model("Нет",null))
-        modelList.add(Model("Низкий", R.drawable.arrow))
-        modelList.add(Model("Высокий", R.drawable.warning))
-        val customDropDownAdapter = CustomDropDownAdapter(requireContext(), modelList)
-        binding.spinner.adapter = customDropDownAdapter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val id = args.id
         if (id != null && savedInstanceState == null) {
             model.getItem(id)
             lifecycleScope.launch {
-                model.task.collect {
+                model.item.collect {
                     if(todoItem.id == "-1") {
                         todoItem = it
                         updateViewsInfo()
@@ -98,11 +97,43 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
             updateViewsInfo()
             setUpViews()
         }
-        return binding.root
+
+        createSpinner()
     }
 
+    private fun createSpinner(){
+        modelList.add(Model("Нет",null))
+        modelList.add(Model("Низкий", R.drawable.arrow))
+        modelList.add(Model("Высокий", R.drawable.warning))
+        val customDropDownAdapter = CustomDropDownAdapter(requireContext(), modelList)
+        binding.spinner.adapter = customDropDownAdapter
+
+        binding.spinner.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>,
+                                        view: View, position: Int, id: Long) {
+                when (position){
+                    0 -> {
+                        todoItem.importance = Importance.REGULAR
+                        importent = 0
+                    }
+                    1 -> {
+                        todoItem.importance = Importance.LOW
+                        importent = 1
+                    }
+                    2 -> {
+                        todoItem.importance = Importance.URGENT
+                        importent = 2
+                    }
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+            }
+        }
+    }
     private fun updateViewsInfo(){
-        binding.infoText.setText(todoItem.textTask)
+        binding.infoText.setText(todoItem.text)
 
         when(todoItem.importance){
             Importance.LOW -> {
@@ -116,73 +147,67 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
             }
         }
 
-        if (todoItem.deadLine != null) {
+        if (todoItem.deadline != null) {
             binding.date.visibility = View.VISIBLE
             binding.date.text = todoItem.deadlineToString()
             binding.turnDate.isChecked = true
         }
 
-//        if (todoItem.id != "-1") {
-//            binding.delete.setTextColor(
-//                AppCompatResources.getColorStateList(
-//                    requireContext(),
-//                    R.color.red
-//                )
-//            )
-
     }
 
     private fun setUpViews(){
         val myCalendar = Calendar.getInstance()
-        if (todoItem.deadLine != null) {
-            myCalendar.time = todoItem.deadLine!!
+        if (todoItem.deadline != null) {
+            myCalendar.time = todoItem.deadline!!
         }
-        val dialog: DatePickerDialog = DatePickerDialog(requireContext(),
-            this,
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH))
+        dialog = DatePickerDialog(
+            requireContext(),
+            R.style.DatePickerStyle,
+            { view, year, month, day ->
+                binding.date.visibility = View.VISIBLE
+                myCalendar.set(Calendar.YEAR, year)
+                myCalendar.set(Calendar.MONTH, month)
+                myCalendar.set(Calendar.DAY_OF_MONTH, day)
+                todoItem.deadline = Date(myCalendar.timeInMillis)
+                binding.date.text = todoItem.deadlineToString()
+            },
+            myCalendar.get(Calendar.YEAR),
+            myCalendar.get(Calendar.MONTH),
+            myCalendar.get(Calendar.DAY_OF_MONTH)
+        )
 
-        dialog.setButton(
-            DialogInterface.BUTTON_NEGATIVE, "Cancel")
-        { _, which ->
-            if (which == DialogInterface.BUTTON_NEGATIVE) {
-                flag = 0
-                println("222")
+        dialog.setOnCancelListener {
+            if (binding.date.visibility == View.INVISIBLE) {
+                binding.turnDate.isChecked = false
             }
         }
-        dialog.setOnDismissListener {
-            when(flag){
-                1 -> {if(binding.date.text == "Дата") {
-                    binding.turnDate.isChecked = false
-                    flag = 0
-                }
-                }
-                0 -> {
-                    binding.turnDate.isChecked = false
-                }
-            }
 
-        }
-        binding.turnDate.setOnClickListener{
-            when(flag) {
-                0 -> {
-                    flag = 1
-                    binding.turnDate.isChecked = true
-                    dialog.show()
-                }
-                else -> {
-                    flag = 0
-                    binding.turnDate.isActivated = false
-                    binding.date.text = "Дата"
-                }
+        binding.turnDate.setOnCheckedChangeListener { _, checked ->
+            if (checked) {
+                openDatePicker()
+            } else {
+                binding.date.visibility = View.INVISIBLE
+                todoItem.deadline = null
             }
         }
+
 
         binding.deleteButt.setOnClickListener {
-            if (args.id != null){
-                model.delItem(todoItem)
+            if (args.id != null) {
+
+                if (model.status.value == ConnectivityObserver.Status.Available) {
+                    model.deleteNetworkItem(todoItem.id)
+                } else {
+                    Toast.makeText(
+                        context,
+                        "No network, will delete later. Continue offline.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                model.deleteItem(todoItem)
+                model.nullItem()
                 findNavController().popBackStack()
+
             }
         }
 
@@ -191,6 +216,7 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
                 .duration(200)
                 .playOn(binding.cancel)
 
+            model.nullItem()
             findNavController().popBackStack()
         }
 
@@ -204,36 +230,55 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
         }
     }
 
-    private fun saveNewTask(){
+    private fun saveNewTask() {
         todoItem.id = UUID.randomUUID().toString()
-        todoItem.textTask = binding.infoText.text.toString()
+        todoItem.text = binding.infoText.text.toString()
         todoItem.dateCreation = Date(System.currentTimeMillis())
-
-        if (todoItem.textTask.isEmpty()) {
+        if (todoItem.text.isEmpty()) {
             Toast.makeText(requireContext(), "Заполните что нужно сделать!", Toast.LENGTH_SHORT)
                 .show()
             return
         }
-
+        if (model.status.value == ConnectivityObserver.Status.Available) {
+            model.updateNetworkItem(todoItem)
+        } else {
+            Toast.makeText(
+                context,
+                "No network, will upload later. Continue offline.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
         model.addItem(todoItem)
+        model.nullItem()
         findNavController().popBackStack()
     }
 
     private fun updateTask() {
-        todoItem.textTask = binding.infoText.text.toString()
+        todoItem.text = binding.infoText.text.toString()
         todoItem.dateChanged = Date(System.currentTimeMillis())
-        if (todoItem.textTask.isEmpty()) {
+        if (todoItem.text.isEmpty()) {
             Toast.makeText(requireContext(), "Заполните что нужно сделать!", Toast.LENGTH_SHORT)
                 .show()
             return
         }
-        model.upItem(todoItem)
+
+        if (model.status.value == ConnectivityObserver.Status.Available) {
+            model.uploadNetworkItem(todoItem)
+        } else {
+            Toast.makeText(
+                context,
+                "No network, will update later. Continue offline.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        model.addItem(todoItem)
+        model.nullItem()
         findNavController().popBackStack()
     }
 
     private fun saveStates() {
-        todoItem.textTask = binding.infoText.text.toString()
-        when (binding.spinner.selectedItemPosition) {
+        todoItem.text = binding.infoText.text.toString()
+        when (importent) {
             2 -> {
                 todoItem.importance = Importance.URGENT
                 println("2")
@@ -256,6 +301,11 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
         super.onSaveInstanceState(outState)
         saveStates()
         outState.putString("todoItem", todoItem.toString())
+    }
+
+    private fun openDatePicker() {
+        binding.turnDate.isChecked = true
+        dialog.show()
     }
 
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {

@@ -3,7 +3,12 @@ package com.example.authorisation.internetThings.network
 import com.example.authorisation.internetThings.RetrofitService
 
 object BaseUrl {
-    private const val baseURL:String = "https://beta.mrdekk.ru/todobackend/"
-    var updated_by = "1"
-    val retrofitService: RetrofitService get() = Client.getClient(baseURL).create(RetrofitService::class.java)
+    var token = "no_token"
+        set(value) {
+            field = value
+            Client.token = value
+        }
+    var phoneID = "id"
+    val retrofitService: RetrofitService =
+        Client.createClient().create(RetrofitService::class.java)
 }
