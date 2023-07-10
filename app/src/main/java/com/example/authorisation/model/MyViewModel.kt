@@ -3,30 +3,20 @@ package com.example.authorisation.model
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.authorisation.SharedPreferencesHelper
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.data.rep.TodoItemsRepository
-import com.example.authorisation.internetThings.StateLoad
 import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
 import com.example.authorisation.internetThings.internetConnection.NetworkConnectivityObserver
-import com.example.authorisation.internetThings.network.NetworkAccess
 import com.example.authorisation.internetThings.network.UiState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import okhttp3.Dispatcher
 
 class MyViewModel(
     private val repository: TodoItemsRepository,

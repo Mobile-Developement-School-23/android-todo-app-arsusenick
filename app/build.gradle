@@ -67,8 +67,19 @@ dependencies {
     implementation 'com.airbnb.android:lottie:6.0.1'
 
     // dagger
-    implementation 'com.google.dagger:dagger:2.46.1'
-    kapt 'com.google.dagger:dagger-compiler:2.46.1'
+    def daggerVer = 2.27 // or latest version
+
+    implementation "com.google.dagger:dagger:$daggerVer"
+    implementation "com.google.dagger:dagger-android-support:$daggerVer"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVer"
+    kapt "com.google.dagger:dagger-compiler:$daggerVer"
+
+    implementation 'com.google.dagger:dagger:2.35.1'
+    implementation 'com.google.dagger:dagger-android:2.35.1'
+    kapt 'com.google.dagger:dagger-compiler:2.35.1'
+    kapt 'com.google.dagger:dagger-android-processor:2.35.1'
+
+    kapt  "com.google.dagger:dagger-android-support:2.12"
 
     // Room
     implementation 'androidx.room:room-runtime:2.5.2'

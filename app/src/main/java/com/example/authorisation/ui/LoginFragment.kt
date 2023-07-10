@@ -9,24 +9,27 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import com.example.authorisation.App
 import com.example.authorisation.SharedPreferencesHelper
 import com.example.authorisation.databinding.FragmentLoginBinding
 import com.example.authorisation.internetThings.localeLazy
 import com.example.authorisation.model.MyViewModel
-import com.example.authorisation.model.factory
+
 import com.yandex.authsdk.YandexAuthException
 import com.yandex.authsdk.YandexAuthLoginOptions
 import com.yandex.authsdk.YandexAuthOptions
 import com.yandex.authsdk.YandexAuthSdk
 import com.yandex.authsdk.internal.strategy.LoginType
+import javax.inject.Inject
 
 
 class LoginFragment : Fragment() {
 
 
-    private val sharedPreferencesHelper: SharedPreferencesHelper by localeLazy()
+    @Inject
+    lateinit var sharedPreferencesHelper: SharedPreferencesHelper
 
-    private val viewModel: MyViewModel by activityViewModels { factory() }
+    private val viewModel: MyViewModel by activityViewModels { (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
 
     private var binding: FragmentLoginBinding? = null
 

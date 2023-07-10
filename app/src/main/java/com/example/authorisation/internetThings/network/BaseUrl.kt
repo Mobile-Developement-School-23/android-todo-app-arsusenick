@@ -6,9 +6,9 @@ object BaseUrl {
     var token = "no_token"
         set(value) {
             field = value
-            Client.token = value
+            RetrofitClient.token = value
         }
     var phoneID = "id"
     val retrofitService: RetrofitService =
-        Client.createClient().create(RetrofitService::class.java)
+        RetrofitClient.createClient().create(RetrofitService::class.java)
 }

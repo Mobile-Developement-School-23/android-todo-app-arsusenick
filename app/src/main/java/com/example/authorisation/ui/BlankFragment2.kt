@@ -24,13 +24,14 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.daimajia.androidanimations.library.Techniques
 import com.daimajia.androidanimations.library.YoYo
+import com.example.authorisation.App
 import com.example.authorisation.R
 import com.example.authorisation.data.dataBase.Importance
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.databinding.FragmentBlank2Binding
 import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
 import com.example.authorisation.model.MyViewModel
-import com.example.authorisation.model.factory
+
 import com.example.authorisation.spinner.CustomDropDownAdapter
 import com.example.authorisation.spinner.Model
 import com.example.authorisation.spinner.SpinnerRep
@@ -58,7 +59,8 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
 
     private val args: TaskFragArgs by navArgs()
 
-    private val model: MyViewModel by activityViewModels{factory()}
+    private val model: MyViewModel by activityViewModels { (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

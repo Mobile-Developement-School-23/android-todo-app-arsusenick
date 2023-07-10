@@ -4,9 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.example.authorisation.data.dataBase.TodoItemDatabase
 import com.example.authorisation.data.dataBase.TodoListDao
+import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+@Module
 class DataBaseModule {
     @Provides
     @Singleton

@@ -12,13 +12,12 @@ import com.example.authorisation.internetThings.network.responces.PostRequest
 import com.example.authorisation.internetThings.network.responces.TODOItem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import javax.inject.Inject
 
-class NetworkSource(
-    private val sharedPreferencesHelper: SharedPreferencesHelper
+class NetworkSource @Inject constructor(
+    private val sharedPreferencesHelper: SharedPreferencesHelper,
+    private val service: RetrofitService
 ) {
-    private val service by lazy {
-        BaseUrl.retrofitService
-    }
 
 
     suspend fun getMergedList(currentList: List<TODOItem>): Flow<StateLoad<List<TodoItem>>> =

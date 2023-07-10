@@ -10,16 +10,23 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.example.authorisation.internetThings.MyWorkManager
-import com.example.authorisation.internetThings.network.Client
+import com.example.authorisation.internetThings.network.RetrofitClient
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 //мейн активити...
 class MainActivity : AppCompatActivity() {
 
     private lateinit var controller: NavController
+
+    @Inject
+    lateinit var sharedPreferencesHelper: SharedPreferencesHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        (applicationContext as App).appComponent.inject(this)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragmentContainerView)
@@ -30,22 +37,24 @@ class MainActivity : AppCompatActivity() {
         val navGraph = graphInflater.inflate(R.navigation.rg)
         controller = navHostFragment.navController
 
-        val destination = if (Client.token == "no_token"
+        val destination = if (sharedPreferencesHelper.getToken() == "no_token"
         ) R.id.loginFragment else R.id.blankFragment
         navGraph.setStartDestination(destination)
         controller.graph = navGraph
+
 
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        internetConnectionUP()
+        periodicUpdate()
     }
 
-    private fun internetConnectionUP(){
+    private fun periodicUpdate() {
         val constraints: Constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
+
 
         val myWorkRequest = PeriodicWorkRequest.Builder(
             MyWorkManager::class.java,

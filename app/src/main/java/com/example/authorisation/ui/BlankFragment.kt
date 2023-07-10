@@ -1,6 +1,7 @@
 package com.example.authorisation.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,15 +9,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.example.authorisation.App
 import com.example.authorisation.R
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.databinding.FragmentBlankBinding
 import com.example.authorisation.internetThings.StateLoad
 import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
+import com.example.authorisation.internetThings.network.UiState
 import com.example.authorisation.model.MyViewModel
-import com.example.authorisation.model.factory
+
 import com.example.authorisation.recyclerview.DealsAdapter
 import com.example.authorisation.recyclerview.ItemListener
 import kotlinx.coroutines.flow.collectLatest
@@ -27,11 +31,10 @@ import kotlinx.coroutines.launch
 
 class BlankFragment : Fragment() {
     private var binding: FragmentBlankBinding? = null
-    private val viewModel: MyViewModel by activityViewModels{factory()}
+    private val viewModel: MyViewModel by activityViewModels { (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
     private val adapter: DealsAdapter? get() = views { tasks.adapter as DealsAdapter }
 
     private var internetState = ConnectivityObserver.Status.Unavailable
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +59,11 @@ class BlankFragment : Fragment() {
 
                 override fun onCheckClick(todoItem: TodoItem) {
                     if (internetState == ConnectivityObserver.Status.Available) {
-                        viewModel.updateNetworkItem(todoItem)
+                        viewModel.updateNetworkItem(
+                            todoItem.copy(
+                                done = !todoItem.done
+                            )
+                        )
                     } else {
                         Toast.makeText(
                             context,
@@ -64,7 +71,11 @@ class BlankFragment : Fragment() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    viewModel.changeItemDone(todoItem)
+                    viewModel.setTask(
+                        todoItem.copy(
+                            done = !todoItem.done
+                        )
+                    )
                 }
 
             })
@@ -93,8 +104,8 @@ class BlankFragment : Fragment() {
         }
 
         lifecycleScope.launch {
-            viewModel.data.collect {
-                updateRecyclerData(it)
+            viewModel.visibility.collectLatest { visibilityState ->
+                updateStateUI(visibilityState)
             }
         }
         lifecycleScope.launch {
@@ -103,11 +114,7 @@ class BlankFragment : Fragment() {
             }
         }
 
-        lifecycleScope.launch {
-            viewModel.loading.collectLatest {
-                updateLoadingUI(it)
-            }
-        }
+        internetState = viewModel.status.value
     }
     private fun updateCounter(count: Int) {
         views {
@@ -115,29 +122,26 @@ class BlankFragment : Fragment() {
         }
     }
 
-    private fun updateLoadingUI(loadingState: StateLoad<Any>) {
-        when (loadingState) {
-            is StateLoad.Loading -> {
-                views {
-                    tasks.visibility = View.GONE
+    private suspend fun updateStateUI(visibilityState: Boolean) {
+        viewModel.data.collect { uiState ->
+            when (uiState) {
+                is UiState.Success -> {
+                    if (visibilityState) {
+                        adapter?.submitList(uiState.data)
+                    } else {
+                        adapter?.submitList(uiState.data.filter { !it.done })
+                    }
+                    views {
+                        tasks.visibility = View.VISIBLE
+                    }
                 }
-            }
 
-            is StateLoad.Success -> {
-                views {
-                    tasks.visibility = View.VISIBLE
+                is UiState.Error -> Log.d("1", uiState.cause)
+                is UiState.Start -> {
+                    views {
+                        tasks.visibility = View.GONE
+                    }
                 }
-            }
-
-            is StateLoad.Error -> {
-                views {
-                    tasks.visibility = View.VISIBLE
-                }
-                Toast.makeText(
-                    context,
-                    loadingState.error,
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
     }
@@ -189,14 +193,6 @@ class BlankFragment : Fragment() {
             }
         }
         internetState = status
-    }
-
-    private fun updateRecyclerData(list: List<TodoItem>) {
-        if (viewModel.modeAll) {
-            adapter?.submitList(list)
-        } else {
-            adapter?.submitList(list.filter { !it.done })
-        }
     }
     private fun <T: Any> views(block: FragmentBlankBinding.() -> T): T? = binding?.block()
 }

@@ -2,7 +2,6 @@ package com.example.authorisation.recyclerview
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
-import com.example.authorisation.MyItemRecyclerViewAdapter
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.recyclerview.domain.DiffUtilCallbackImpl
 
