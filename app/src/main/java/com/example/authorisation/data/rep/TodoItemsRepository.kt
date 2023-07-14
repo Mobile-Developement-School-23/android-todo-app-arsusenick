@@ -6,16 +6,18 @@ import com.example.authorisation.data.dataBase.TodoItemEnt
 import com.example.authorisation.data.dataBase.TodoListDao
 import com.example.authorisation.internetThings.NetworkSource
 import com.example.authorisation.internetThings.StateLoad
-import com.example.authorisation.internetThings.network.BaseUrl
+
 import com.example.authorisation.internetThings.network.UiState
 import com.example.authorisation.internetThings.network.responces.TODOItem
+import com.example.authorisation.internetThings.notifications.NotificationsSchedulerImpl
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class TodoItemsRepository @Inject constructor(
     private val todoItemDao: TodoListDao,
-    private val networkSource: NetworkSource
+    private val networkSource: NetworkSource,
+    private val notificationsScheduler: NotificationsSchedulerImpl
 ): RepInterface{
     override fun getAllData(): Flow<UiState<List<TodoItem>>> = flow {
         emit(UiState.Start)
@@ -28,18 +30,21 @@ class TodoItemsRepository @Inject constructor(
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
         todoItemDao.add(toDoItemEntity)
         networkSource.postElement(todoItem)
+        notificationsScheduler.schedule(todoItem)
     }
 
     override suspend fun deleteItem(todoItem: TodoItem) {
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
         todoItemDao.delete(toDoItemEntity)
         networkSource.deleteElement(todoItem.id)
+        notificationsScheduler.cancel(todoItem.id)
     }
 
     override suspend fun changeItem(todoItem: TodoItem){
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
         todoItemDao.updateItem(toDoItemEntity)
         networkSource.updateElement(todoItem)
+        notificationsScheduler.schedule(todoItem)
     }
 
 
@@ -53,11 +58,18 @@ class TodoItemsRepository @Inject constructor(
                     is StateLoad.Result -> {
                         todoItemDao.addList(state.data.map { TodoItemEnt.fromItem(it) })
                         emit(UiState.Success(state.data))
+                        updateNotifications(state.data)
                     }
                 }
             }
     }
 
+    private fun updateNotifications(items: List<TodoItem>) {
+        notificationsScheduler.cancelAll()
+        for (item in items){
+            notificationsScheduler.schedule(item)
+        }
+    }
 
     override fun getItem(itemId: String): TodoItem = todoItemDao.getItem(itemId).toItem()
 

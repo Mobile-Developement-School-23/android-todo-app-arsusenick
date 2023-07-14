@@ -13,8 +13,8 @@
             android:id="@+id/action_blankFragment_to_blankFragment2"
             app:destination="@id/blankFragment2" />
         <action
-            android:id="@+id/action_blankFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_blankFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/blankFragment2"
@@ -33,5 +33,14 @@
         <action
             android:id="@+id/action_loginFragment_to_blankFragment"
             app:destination="@id/blankFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.authorisation.ui.view.settings.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 </navigation>

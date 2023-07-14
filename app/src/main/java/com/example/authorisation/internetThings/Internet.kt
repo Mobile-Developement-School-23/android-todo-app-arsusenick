@@ -61,6 +61,8 @@ class NetworkSource @Inject constructor(
                 emit(StateLoad.Exception(exception))
             } catch (exception: HttpException){
                 emit(StateLoad.Exception(exception))
+            } catch (other:Exception){
+                emit(StateLoad.Exception(other))
             }
         }
 
@@ -78,6 +80,8 @@ class NetworkSource @Inject constructor(
             Log.d("1", exception.toString())
         } catch (exception: HttpException){
             Log.d("1", exception.toString())
+        } catch (other:Exception){
+            Log.d("1", other.toString())
         }
     }
 
@@ -96,6 +100,8 @@ class NetworkSource @Inject constructor(
             Log.d("1", exception.toString())
         } catch (exception: HttpException){
             Log.d("1", exception.toString())
+        } catch (other:Exception){
+            Log.d("1", other.toString())
         }
     }
 
@@ -116,6 +122,8 @@ class NetworkSource @Inject constructor(
             Log.d("1", exception.toString())
         } catch (exception: HttpException){
             Log.d("1", exception.toString())
+        } catch (other:Exception){
+            Log.d("1", other.toString())
         }
     }
 }

@@ -14,6 +14,17 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="MySwitch" parent="Theme.AppCompat.Light">
+        <!-- активное состояние (30% прозрачности для фона) -->
+        <item name="colorControlActivated">@color/blue</item>
+
+        <!-- неактивное состояние ползунка -->
+        <item name="colorSwitchThumbNormal">@color/backElevated</item>
+
+        <!-- цвет дорожки для неактивного состояния (30% прозрачности) -->
+        <item name="android:colorForeground">@color/supOverlay</item>
+    </style>
+
     <style name="DatePickerStyle" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorAccent">@color/blue</item>
         <item name="colorSecondary">@color/blue</item>
@@ -28,5 +39,33 @@
         <item name="android:buttonBarPositiveButtonStyle">@style/DatePickerTheme.ButtonBarButton </item>
     </style>
     <style name="DatePickerTheme.ButtonBarButton" parent="Widget.MaterialComponents.Button.TextButton.Dialog"> <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheetStyle</item>
+    </style>
+
+    <style name="CustomBottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="AlertDialogCustom" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/blue</item>
+        <!-- Used for the title and text -->
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialogText</item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialogText</item>
+        <!-- Used for the background -->=
+        <item name="shapeAppearanceOverlay">@style/MaterialAlertDialogCorners</item>
+    </style>
+
+    <style name="MaterialAlertDialogCorners">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="MaterialAlertDialogText" parent="MaterialAlertDialog.MaterialComponents.Body.Text">
+        <item name="fontFamily">@font/regular</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

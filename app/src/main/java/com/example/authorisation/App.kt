@@ -17,7 +17,7 @@ class App : Application() {
     lateinit var myWorkRequest: PeriodicWorkRequest
 
     @Inject
-    lateinit var coroutineScope: CoroutineScope
+    lateinit var sharedPreferencesHelper:SharedPreferencesHelper
 
 
     lateinit var appComponent: ApplicationComponent
@@ -26,6 +26,7 @@ class App : Application() {
         appComponent = DaggerApplicationComponent.factory().create(this)
         appComponent.inject(this)
 
+        sharedPreferencesHelper.setMode(sharedPreferencesHelper.getMode())
         periodicUpdate()
     }
 
@@ -35,12 +36,6 @@ class App : Application() {
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             myWorkRequest
         )
-    }
-
-
-    override fun onTerminate() {
-        super.onTerminate()
-        coroutineScope.cancel()
     }
 
 

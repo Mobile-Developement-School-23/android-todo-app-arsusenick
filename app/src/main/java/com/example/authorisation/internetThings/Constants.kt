@@ -6,4 +6,5 @@ object Constants {
     const val SERVER_URL = "https://beta.mrdekk.ru/todobackend/"
     const val TIMEOUT:Long = 120
     const val DEFAULT_DATE:Long = 0
+    var phoneId = "uid"
 }
