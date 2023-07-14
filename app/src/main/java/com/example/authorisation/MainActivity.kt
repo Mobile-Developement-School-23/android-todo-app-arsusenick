@@ -25,50 +25,35 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         (applicationContext as App).appComponent.inject(this)
-
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainerView)
-                    as NavHostFragment
-        controller = navHostFragment.navController
-
-        val graphInflater = navHostFragment.navController.navInflater
-        val navGraph = graphInflater.inflate(R.navigation.rg)
-        controller = navHostFragment.navController
-
-        val destination = if (sharedPreferencesHelper.getToken() == "no_token"
-        ) R.id.loginFragment else R.id.blankFragment
-        navGraph.setStartDestination(destination)
-        controller.graph = navGraph
+        controller = getRootNavController()
 
 
+        if (savedInstanceState != null) {
+            controller.restoreState(savedInstanceState.getBundle("state"))
+        } else {
+            val navHostFragment =
+                supportFragmentManager.findFragmentById(R.id.fragmentContainerView)
+                        as NavHostFragment
+            val graphInflater = navHostFragment.navController.navInflater
+            val navGraph = graphInflater.inflate(R.navigation.rg)
+
+            controller = navHostFragment.navController
+            val destination = if (sharedPreferencesHelper.getToken() == "no_token"
+            ) R.id.loginFragment else R.id.blankFragment
+
+            navGraph.setStartDestination(destination)
+
+            controller.graph = navGraph
+        }
+    }
+    private fun getRootNavController(): NavController {
+        val navHost = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+        return navHost.navController
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        periodicUpdate()
-    }
-
-    private fun periodicUpdate() {
-        val constraints: Constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-
-        val myWorkRequest = PeriodicWorkRequest.Builder(
-            MyWorkManager::class.java,
-            8,
-            TimeUnit.HOURS
-        )
-            .setConstraints(constraints)
-            .addTag("update_data")
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "update_data",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            myWorkRequest
-        )
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBundle("state", controller.saveState())
     }
 }

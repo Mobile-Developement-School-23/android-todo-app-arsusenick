@@ -11,8 +11,5 @@ interface RepInterface {
     suspend fun deleteItem(todoItem: TodoItem)
     suspend fun changeItem(todoItem: TodoItem)
     fun getNetworkTasks(): Flow<UiState<List<TodoItem>>>
-    suspend fun postNetworkItem(newItem: TodoItem)
-    suspend fun deleteNetworkItem(id: String)
-    suspend fun updateNetworkItem(item: TodoItem)
-    suspend fun deleteAll()
+    suspend fun deleteCurrentItems()
 }

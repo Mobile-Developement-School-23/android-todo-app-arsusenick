@@ -1,26 +1,47 @@
 package com.example.authorisation
 
 import android.app.Application
-import android.content.Context
-import com.example.authorisation.internetThings.ServiceLocator
-import com.example.authorisation.internetThings.locale
-import com.example.authorisation.data.dataBase.TodoItemDatabase
-import com.example.authorisation.data.rep.TodoItemsRepository
-import com.example.authorisation.di.AppModule
-import com.example.authorisation.di.ApplicationComponent
-import com.example.authorisation.di.DaggerApplicationComponent
-import com.example.authorisation.internetThings.NetworkSource
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
+import com.example.authorisation.di.component.ApplicationComponent
+import com.example.authorisation.di.component.DaggerApplicationComponent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import javax.inject.Inject
 
-import com.example.authorisation.internetThings.internetConnection.NetworkConnectivityObserver
+class App : Application() {
 
-class App: Application() {
+
+    @Inject
+    lateinit var myWorkRequest: PeriodicWorkRequest
+
+    @Inject
+    lateinit var coroutineScope: CoroutineScope
+
 
     lateinit var appComponent: ApplicationComponent
     override fun onCreate() {
         super.onCreate()
-        appComponent = DaggerApplicationComponent.builder()
-            .appModule(AppModule(this))
-            .build()
+        appComponent = DaggerApplicationComponent.factory().create(this)
+        appComponent.inject(this)
 
+        periodicUpdate()
     }
+
+    private fun periodicUpdate() {
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "update_data",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            myWorkRequest
+        )
+    }
+
+
+    override fun onTerminate() {
+        super.onTerminate()
+        coroutineScope.cancel()
+    }
+
+
 }

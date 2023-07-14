@@ -9,20 +9,19 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.LifecycleOwner
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.authorisation.App
 import com.example.authorisation.R
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.databinding.FragmentBlankBinding
-import com.example.authorisation.internetThings.StateLoad
 import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
 import com.example.authorisation.internetThings.network.UiState
-import com.example.authorisation.model.MyViewModel
 
 import com.example.authorisation.recyclerview.DealsAdapter
 import com.example.authorisation.recyclerview.ItemListener
+import com.example.authorisation.ui.stateHold.MyViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -31,7 +30,8 @@ import kotlinx.coroutines.launch
 
 class BlankFragment : Fragment() {
     private var binding: FragmentBlankBinding? = null
-    private val viewModel: MyViewModel by activityViewModels { (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
+    private val viewModel: MyViewModel by viewModels {
+        (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
     private val adapter: DealsAdapter? get() = views { tasks.adapter as DealsAdapter }
 
     private var internetState = ConnectivityObserver.Status.Unavailable
@@ -58,20 +58,7 @@ class BlankFragment : Fragment() {
                 }
 
                 override fun onCheckClick(todoItem: TodoItem) {
-                    if (internetState == ConnectivityObserver.Status.Available) {
-                        viewModel.updateNetworkItem(
-                            todoItem.copy(
-                                done = !todoItem.done
-                            )
-                        )
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "No internet connection, will upload with later. Continue offline.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    viewModel.setTask(
+                    viewModel.updateItem(
                         todoItem.copy(
                             done = !todoItem.done
                         )

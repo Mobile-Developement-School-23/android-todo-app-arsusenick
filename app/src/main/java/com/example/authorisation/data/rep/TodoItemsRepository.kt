@@ -24,26 +24,24 @@ class TodoItemsRepository @Inject constructor(
         }
     }
 
-    override fun getItem(itemId: String): TodoItem = todoItemDao.getItem(itemId).toItem()
-
-    override suspend fun addItem(todoItem: TodoItem) {
+    override suspend fun addItem(todoItem: TodoItem){
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
-        return todoItemDao.add(toDoItemEntity)
+        todoItemDao.add(toDoItemEntity)
+        networkSource.postElement(todoItem)
     }
 
     override suspend fun deleteItem(todoItem: TodoItem) {
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
-        return todoItemDao.delete(toDoItemEntity)
+        todoItemDao.delete(toDoItemEntity)
+        networkSource.deleteElement(todoItem.id)
     }
 
-    override suspend fun changeItem(todoItem: TodoItem) {
+    override suspend fun changeItem(todoItem: TodoItem){
         val toDoItemEntity = TodoItemEnt.fromItem(todoItem)
-        return todoItemDao.updateItem(toDoItemEntity)
+        todoItemDao.updateItem(toDoItemEntity)
+        networkSource.updateElement(todoItem)
     }
 
-    suspend fun changeDone(id: String, done: Boolean) {
-        return todoItemDao.updateDone(id, done, System.currentTimeMillis())
-    }
 
     override fun getNetworkTasks(): Flow<UiState<List<TodoItem>>> = flow {
         emit(UiState.Start)
@@ -53,36 +51,18 @@ class TodoItemsRepository @Inject constructor(
                     StateLoad.Initial -> emit(UiState.Start)
                     is StateLoad.Exception -> emit(UiState.Error(state.cause.message.toString()))
                     is StateLoad.Result -> {
-                        updateRoom(state.data)
+                        todoItemDao.addList(state.data.map { TodoItemEnt.fromItem(it) })
                         emit(UiState.Success(state.data))
                     }
                 }
             }
     }
 
-    private suspend fun updateRoom(mergedList: List<TodoItem>) {
-        todoItemDao.addList(mergedList.map { TodoItemEnt.fromItem(it) })
-    }
 
-    override suspend fun postNetworkItem(
-        newItem: TodoItem
-    ) {
-        networkSource.postElement(newItem)
-    }
+    override fun getItem(itemId: String): TodoItem = todoItemDao.getItem(itemId).toItem()
 
-    override suspend fun deleteNetworkItem(
-        id: String
-    ) {
-        networkSource.deleteElement(id)
-    }
 
-    override suspend fun updateNetworkItem(
-        item: TodoItem
-    ) {
-        networkSource.updateElement(item)
-    }
-
-    override suspend fun deleteAll() {
+    override suspend fun deleteCurrentItems() {
         todoItemDao.deleteAll()
     }
 

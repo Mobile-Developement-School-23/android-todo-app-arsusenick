@@ -36,6 +36,14 @@ class SharedPreferencesHelper @Inject constructor(
         return sharedPreferences.getString("token", "unaffordable")!!
     }
 
+    fun getTokenForResponse():String{
+        return if (getToken() == "unaffordable") {
+            "Bearer unaffordable"
+        } else {
+            "OAuth ${getToken()}"
+        }
+    }
+
     fun getPhoneID():String = sharedPreferences.getString("UID", "uid").toString()
     fun putToken(token: String) {
         editor.putString("token", token)

@@ -1,4 +1,4 @@
-package com.example.authorisation.di
+package com.example.authorisation.di.modules
 
 import android.content.Context
 import com.example.authorisation.SharedPreferencesHelper

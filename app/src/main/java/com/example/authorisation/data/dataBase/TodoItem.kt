@@ -1,5 +1,6 @@
 package com.example.authorisation.data.dataBase
 
+import com.example.authorisation.internetThings.Constants.DEFAULT_DATE
 import com.google.gson.Gson
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -17,7 +18,7 @@ data class TodoItem(
 
     constructor() : this(
         id = "-1", text = "", importance = Importance.REGULAR,
-        deadline = null, done = false, dateCreation = Date(1000), dateChanged = null
+        deadline = null, done = false, dateCreation = Date(DEFAULT_DATE), dateChanged = null
     )
 
     fun deadlineToString(): String? {

@@ -1,25 +1,20 @@
 package com.example.authorisation.ui
 
 import android.app.DatePickerDialog
-import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.DatePicker
-import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.widget.AppCompatSpinner
-import androidx.appcompat.widget.SwitchCompat
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.daimajia.androidanimations.library.Techniques
@@ -29,12 +24,14 @@ import com.example.authorisation.R
 import com.example.authorisation.data.dataBase.Importance
 import com.example.authorisation.data.dataBase.TodoItem
 import com.example.authorisation.databinding.FragmentBlank2Binding
+import com.example.authorisation.internetThings.Constants.ANIMATION_DURATION
 import com.example.authorisation.internetThings.internetConnection.ConnectivityObserver
-import com.example.authorisation.model.MyViewModel
+import com.example.authorisation.internetThings.network.UiState
 
 import com.example.authorisation.spinner.CustomDropDownAdapter
 import com.example.authorisation.spinner.Model
-import com.example.authorisation.spinner.SpinnerRep
+import com.example.authorisation.ui.stateHold.ManageTaskViewModel
+import com.example.authorisation.ui.stateHold.MyViewModel
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.sql.Date
@@ -59,7 +56,8 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
 
     private val args: TaskFragArgs by navArgs()
 
-    private val model: MyViewModel by activityViewModels { (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
+    private val model: ManageTaskViewModel by viewModels {
+        (requireContext().applicationContext as App).appComponent.viewModelsFactory() }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -78,32 +76,28 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
         super.onViewCreated(view, savedInstanceState)
 
         val id = args.id
-        if (id != null && savedInstanceState == null) {
+        if (id != null) {
             model.getItem(id)
-            lifecycleScope.launch {
-                model.item.collect {
-                    if(todoItem.id == "-1") {
-                        todoItem = it
-                        updateViewsInfo()
-                        setUpViews()
+        } else {
+            model.setItem()
+        }
+        lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                model.todoItem.collect { state ->
+                    when (state) {
+                        is UiState.Success -> {
+                            updateViewsInfo(state.data)
+                            setUpViews(state.data)
+                            createSpinner(state.data)
+                        }
+                        else ->{ println("a))))???") }
                     }
                 }
             }
-        } else if (savedInstanceState == null) {
-            setUpViews()
         }
-
-        if (savedInstanceState != null) {
-            val gson = Gson()
-            todoItem = gson.fromJson(savedInstanceState.getString("todoItem"), TodoItem::class.java)
-            updateViewsInfo()
-            setUpViews()
-        }
-
-        createSpinner()
     }
 
-    private fun createSpinner(){
+    private fun createSpinner(todoItem: TodoItem){
         modelList.add(Model("Нет",null))
         modelList.add(Model("Низкий", R.drawable.arrow))
         modelList.add(Model("Высокий", R.drawable.warning))
@@ -134,7 +128,7 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
             }
         }
     }
-    private fun updateViewsInfo(){
+    private fun updateViewsInfo(todoItem: TodoItem){
         binding.infoText.setText(todoItem.text)
 
         when(todoItem.importance){
@@ -157,7 +151,7 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
 
     }
 
-    private fun setUpViews(){
+    private fun setUpViews(todoItem: TodoItem){
         val myCalendar = Calendar.getInstance()
         if (todoItem.deadline != null) {
             myCalendar.time = todoItem.deadline!!
@@ -196,29 +190,15 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
 
         binding.deleteButt.setOnClickListener {
             if (args.id != null) {
-
-                if (model.status.value == ConnectivityObserver.Status.Available) {
-                    model.deleteNetworkItem(todoItem.id)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "No network, will delete later. Continue offline.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
                 model.deleteItem(todoItem)
-                model.nullItem()
                 findNavController().popBackStack()
-
             }
         }
 
         binding.cancel.setOnClickListener {
             YoYo.with(Techniques.BounceIn)
-                .duration(200)
+                .duration(ANIMATION_DURATION)
                 .playOn(binding.cancel)
-
-            model.nullItem()
             findNavController().popBackStack()
         }
 
@@ -241,17 +221,7 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
                 .show()
             return
         }
-        if (model.status.value == ConnectivityObserver.Status.Available) {
-            model.updateNetworkItem(todoItem)
-        } else {
-            Toast.makeText(
-                context,
-                "No network, will upload later. Continue offline.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
         model.addItem(todoItem)
-        model.nullItem()
         findNavController().popBackStack()
     }
 
@@ -264,17 +234,7 @@ class BlankFragment2 : Fragment(),DatePickerDialog.OnDateSetListener {
             return
         }
 
-        if (model.status.value == ConnectivityObserver.Status.Available) {
-            model.uploadNetworkItem(todoItem)
-        } else {
-            Toast.makeText(
-                context,
-                "No network, will update later. Continue offline.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
         model.updateItem(todoItem)
-        model.nullItem()
         findNavController().popBackStack()
     }
 

@@ -1,4 +1,4 @@
-package com.example.authorisation.di
+package com.example.authorisation.di.modules
 
 import com.example.authorisation.data.rep.RepInterface
 import com.example.authorisation.data.rep.TodoItemsRepository
