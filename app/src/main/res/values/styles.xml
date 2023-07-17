@@ -17,4 +17,10 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/labPrimary</item>
     </style>
+
+    <style name="H1">
+        <item name="android:fontFamily">@font/regular</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:textColor">@color/labPrimary</item>
+    </style>
 </resources>

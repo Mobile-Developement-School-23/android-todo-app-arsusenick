@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".BlankFragment"
+    tools:context=".ui.view.tasks.BlankFragment"
     android:fitsSystemWindows="false">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -49,6 +49,19 @@
                 android:textOff=""
                 android:textOn=""/>
 
+            <ImageView
+                android:id="@+id/connection"
+                android:layout_width="50dp"
+                android:layout_height="53dp"
+                android:padding="13dp"
+                android:layout_marginEnd="70dp"
+                android:fontFamily="@font/regular"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/internet"
+                android:textColor="@color/labTertiary"
+                android:textSize="16sp"
+                />
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolBar"
                 android:elevation="10dp"
@@ -67,40 +80,60 @@
         tools:context=".MainActivity"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/add_butt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:backgroundTint="@color/blue"
-            android:elevation="10dp"
-            android:src="@drawable/plus"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/pull_to_refresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:background="@drawable/tasks_background"
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tasks"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingBottom="10dp"/>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/tasks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                tools:itemCount="4"
+                android:background="@drawable/background_recycle"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/low_prer"
+                android:paddingBottom="10dp"/>
 
+        </LinearLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settings_butt"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="86dp"
+        android:src="@drawable/settings"
+        app:backgroundTint="@color/backSecondary"
+        app:elevation="2dp"
+        android:layout_gravity="bottom|end"
+        app:maxImageSize="20dp"
+        app:tint="@color/blue" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_butt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/blue"
+        app:elevation="2dp"
+        android:layout_gravity="bottom|end"
+        android:src="@drawable/plus"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

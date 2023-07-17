@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:background="@color/backPrimary"
     android:layout_height="match_parent"
-    tools:context=".BlankFragment2">
+    tools:context=".ui.view.changeTask.BlankFragment2">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/card"
@@ -21,15 +21,17 @@
             android:background="@color/backPrimary"
             android:paddingTop="30dp"
             android:paddingBottom="30dp">
+
             <ImageButton
                 android:id="@+id/cancel"
                 android:layout_width="14dp"
                 android:layout_height="14dp"
+                android:layout_marginStart="16dp"
                 android:background="@drawable/cancel_inon"
-                android:layout_marginStart="21dp"
-                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/save"
                 android:layout_width="wrap_content"
@@ -57,42 +59,29 @@
         app:layout_constraintTop_toBottomOf="@id/card">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/aaoo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:background="@color/backPrimary"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="4dp"
-                app:cardUseCompatPadding="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="104dp" />
+            android:paddingBottom="20dp">
 
                 <EditText
                     android:id="@+id/info_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    android:gravity="top"
-                    android:background="@color/backSecondary"
-                    android:hint="Купить что то"
-                    android:textColor="@color/labPrimary"
-                    android:textSize="16sp" />
-            </androidx.cardview.widget.CardView>
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:background="@drawable/background_recycle"
+                    android:minLines="4"
+                    android:layout_marginHorizontal="8dp"
+                    android:textSize="16sp"
+                    android:hint="Что надо сделать..."
+                    style="@style/H1"
+                    android:textColorHint="@color/labTertiary"
+                    android:gravity="top|start"
+                    android:padding="16dp"
+                    android:layout_marginTop="20dp"
+                    android:elevation="1dp" />
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/ooaa"
@@ -104,7 +93,7 @@
 
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/card_view">
+                app:layout_constraintTop_toBottomOf="@+id/info_text">
 
                 <TextView
                     android:id="@+id/important"
@@ -209,6 +198,7 @@
                     app:layout_constraintTop_toBottomOf="@id/trashStick" />
 
                 <TextView
+                    android:id="@+id/delete"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_marginStart="17dp"
