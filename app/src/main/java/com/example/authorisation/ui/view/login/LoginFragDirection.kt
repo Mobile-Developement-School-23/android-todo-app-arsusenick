@@ -1,4 +1,4 @@
-package com.example.authorisation.ui
+package com.example.authorisation.ui.view.login
 
 import androidx.navigation.ActionOnlyNavDirections
 import androidx.navigation.NavDirections

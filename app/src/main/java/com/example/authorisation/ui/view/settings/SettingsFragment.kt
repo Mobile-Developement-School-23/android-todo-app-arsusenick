@@ -14,7 +14,6 @@ import com.example.authorisation.R
 import com.example.authorisation.SharedPreferencesHelper
 import com.example.authorisation.databinding.FragmentSettingsBinding
 import com.example.authorisation.internetThings.Mode
-import com.example.authorisation.ui.SettFragDirection
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 

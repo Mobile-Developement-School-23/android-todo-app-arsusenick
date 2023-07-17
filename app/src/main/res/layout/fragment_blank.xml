@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.BlankFragment"
+    tools:context=".ui.view.tasks.BlankFragment"
     android:fitsSystemWindows="false">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -110,6 +110,20 @@
         </LinearLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settings_butt"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="86dp"
+        android:src="@drawable/settings"
+        app:backgroundTint="@color/backSecondary"
+        app:elevation="2dp"
+        android:layout_gravity="bottom|end"
+        app:maxImageSize="20dp"
+        app:tint="@color/blue" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/add_butt"
         android:layout_width="wrap_content"

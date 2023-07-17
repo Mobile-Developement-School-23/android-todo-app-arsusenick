@@ -11,12 +11,16 @@ android {
 
     defaultConfig {
         applicationId "com.example.authorisation"
-        minSdk 24
+        minSdk 26
         targetSdk 33
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [YANDEX_CLIENT_ID:"c8046cf1959b4842a4567e5f7702df26"]
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
     }
 
     buildTypes {
@@ -42,10 +46,15 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        compose true
     }
-
-    defaultConfig {
-        manifestPlaceholders = [YANDEX_CLIENT_ID:"c8046cf1959b4842a4567e5f7702df26"]
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.0"
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
     }
 }
 

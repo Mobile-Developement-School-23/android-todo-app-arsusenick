@@ -1,6 +1,7 @@
-package com.example.authorisation.ui
+package com.example.authorisation.ui.view.tasks
 
 import android.os.Bundle
+import androidx.navigation.ActionOnlyNavDirections
 import androidx.navigation.NavDirections
 import com.example.authorisation.R
 
@@ -20,5 +21,7 @@ public class TaskFragDirection private constructor() {
 
     public companion object {
         public fun actionManageTask(id: String?): NavDirections = ActionManageTask(id)
+
+        public fun actionSetting(): NavDirections = ActionOnlyNavDirections(R.id.action_blankFragment_to_settingsFragment)
     }
 }

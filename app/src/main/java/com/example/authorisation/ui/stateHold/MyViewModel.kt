@@ -32,14 +32,15 @@ class MyViewModel @Inject constructor(
     private val _data = MutableStateFlow<UiState<List<TodoItem>>>(UiState.Start)
     val data: StateFlow<UiState<List<TodoItem>>> = _data.asStateFlow()
 
+    val countComplete = _data.map { state ->
+        when (state) {
+            is UiState.Success -> {
+                state.data.count { it.done }
+            }
 
-    val countComplete = _data.map{ state->
-        when(state){
-            is UiState.Success->{
-                state.data.count{it.done}
-            }else->{
-            0
-        }
+            else -> {
+                0
+            }
         }
     }
 
@@ -53,7 +54,7 @@ class MyViewModel @Inject constructor(
     }
 
     private fun observeNetwork() {
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.IO) {
             connection.observe().collectLatest {
                 _status.emit(it)
             }
@@ -65,14 +66,21 @@ class MyViewModel @Inject constructor(
     }
 
 
-    fun loadData(){
+    fun loadData() {
         coroutineScope.launch(Dispatchers.IO) {
             _data.emitAll(repository.getAllData())
         }
     }
-    fun loadNetworkList(){
+
+    fun loadNetworkList() {
         coroutineScope.launch(Dispatchers.IO) {
             _data.emitAll(repository.getNetworkTasks())
+        }
+    }
+
+    fun addItem(todoItem: TodoItem) {
+        coroutineScope.launch(Dispatchers.IO) {
+            repository.addItem(todoItem.copy())
         }
     }
 
@@ -88,8 +96,4 @@ class MyViewModel @Inject constructor(
             repository.changeItem(task)
         }
     }
-
-
-
-
 }
